@@ -110,7 +110,7 @@ Our objective for the patient advocacy watchdog is clean, merge, explore, and pr
 
 ```{r}
 ## Make sure to adjust your path!
-filepath <- "~/Downloads/hospitals_current_data_FY2024/"
+filepath <- "~/Desktop/hospitals_current_data_FY2024/"
 ```
 
 
@@ -151,7 +151,6 @@ names(files) <- "File Name"
 
 #### Now, let's look at a list of the files that we've read in:
 ```{r, echo = FALSE}
-library(kableExtra)
 files %>% 
   kable(
     format = "html",
@@ -164,7 +163,7 @@ files %>%
 Take a look at some of the dataframes, e.g., `HCAHPS` and `FY_2024_Hospital_Readmissions_Reduction_Program`. What do you notice about the format / structure of the data? Does the data have an issue with the dimensionality? 
 **Hint: **Check to see if each row represents a single line of data or not!
 
-> Under the HAC reduction program data, there are duplicate entries of hospitals and the associated information. The same is true for the HCAHPS data, it is hard to follow and many duplicate hospital entries for different questions, these questions are also repeated. 
+> Your answer here.
 
 
 ### Tidy the data response variables' dataframe: Fiscal Year 2024 Hospital Readmissions Reduction Program.
@@ -172,11 +171,8 @@ We are going to focus on the dataset `FY_2024_Hospital_Readmissions_Reduction_Pr
 
 ##### **Question 3**: [1 point] 
 Take a deeper look at `FY_2024_Hospital_Readmissions_Reduction_Program` at some of the numeric variables in the dataset, e.g., `NumberOfReadmissions`? 
-```{r}
-sum(is.na(FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions))
-```
 
-> Number of readmissions has about 1/3 of the data listed as "N/A" meaning that 1/3 of the data has missing values in that column alone. 
+> Your answer here.
 
 ```{r}
 sum(is.na(FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions))
@@ -199,31 +195,28 @@ You will notice that this aberrant class of missing value __caused__ the numeric
 ##### **Question 5**: [1 point] 
 Look more closely at the `NumberOfReadmissions` column in the `FY_2024_Hospital_Readmissions_Reduction_Program`. What other issue do you see with this specific column that is coercing it to the character type, and why does it exist? 
 
-
-
 **Hint: ** Make sure to use the accompanying data dictionary **HOSPITAL_Data_Dictionary.pdf** to also examine **WHY** this problem exists!
 
-> "Too few to report" is continually reported rather than a number because readmissions are based on a 30 day period.
+> Your answer here.
 
 
 ##### **Question 6**: [1 point] 
 Investigate the `gsub()` function that is part of base `R` or any other function of your choosing. Use the function you choose to **replace** the problematic text in  the `NumberOfReadmissions` column in `FY_2024_Hospital_Readmissions_Reduction_Program` with a **5**.
 ```{r}
 # ?gsub
-# FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions <-
-  gsub(pattern = "Too Few to Report",replacement = "5",x = FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions)
+# Your code here.
 ```
 
 ##### **Question 7**: [1 point] 
 Speculate as to why I asked you to replace the text with a **5** rather than a **0** or an `NA`. Can you think of any other logical choices for the substitution? Do you agree with my choice? (You're free to disagree, but please defend your decision either way!)
 
-> A "5" gives a more realistic representation of the data becasue "too few to report" suggests there are sill values to be measured and there are still "N/A" values which more likely represents zeroes. 
+> Your answer here.
 
 
 ##### **Question 8**: [1 point] 
 Now, imagine an alternative scenario where instead of replacing it with a **5**, I instead asked you to replace it with a randomly sampled integer from 1 to 10. What would this do? Would `gsub()` work here or would I need to execute it a different way, e.g., with an `lapply()` function or a `for()` loop?
 
-> Replacing with a random integer 1-10 would preserve variation in the data and better reflect the uncertainty that is probable within the dataset. Gsub() is not ideal in this situation becasue it stands for "global substitute" meaning it finds and replaces all occurences within a string. Lapply() is another option that could assist. Alternatively, we could use the set.seed() function to produce a number generator and sample() to generate a random integer for each row. 
+> Your answer here.
 
 
 ##### **Question 9**: [3 points] 
@@ -234,14 +227,7 @@ You probably anticipated this! We just decided that, rather than a **5** we want
 **Hint 2: ** This is NOT the only way to do this, but I solved this using `gregexpr()`, `regmatches()`, and `lapply()`.
 
 ```{r}
-# df <- FY_2024_Hospital_Readmissions_Reduction_Program
-matches <- gregexpr("Too Few to Report",
-                     FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions)
-regmatches(FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions, matches) <-
-  lapply(
-    regmatches(FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions, matches),
-    function(x) sample(1:10, length(x), replace = TRUE)
-  )
+# Your code here.
 ```
 
 
@@ -249,15 +235,7 @@ regmatches(FY_2024_Hospital_Readmissions_Reduction_Program$NumberOfReadmissions,
 It is finally time to fix those aberrant character columns by making them  numeric. However, just using `as.numeric()` would require us to do it over and over on each of the columns in multiple lines of code. Instead, investigate the function `mutate_at()` which will allow you to pass it a list of columns you want to convert with the function you want to use.
 ```{r}
 # ?mutate_at
-# FY_2024_Hospital_Readmissions_Reduction_Program <-
-  FY_2024_Hospital_Readmissions_Reduction_Program %>%
-  mutate_at(
-    vars(NumberOfReadmissions,
-         ExcessReadmissionRatio,
-         PredictedReadmissionRate,
-         ExpectedReadmissionRate),
-    as.numeric
-  )
+# Your code here.
 ```
 
 #### Let's look more closely at Measure Names.
@@ -278,14 +256,7 @@ load(file = "readmissionsClean.Rdata")
 Investigate the function `pivot_wider()` or `spread()` from the `tidyr` package, which comes bundled with `tidyverse`. Try pivoting the `FY_2024_Hospital_Readmissions_Reduction_Program` dataset wider. Make sure you correctly identify the `names_from` and `values_from` column(s). **Make sure to save it as a separate dataframe called `wideDF`.** Use the `dim()` function to prove to me that you successfully pivoted wider.
 
 ```{r}
-library(tidyr)
-library(dplyr)
-
-wideDF <- FY_2024_Hospital_Readmissions_Reduction_Program %>%
-  pivot_wider(
-    names_from = MeasureName,
-    values_from = NumberOfReadmissions
-  )
+# Your code here.
 
 #wideDF <- FY_2024_Hospital_Readmissions_Reduction_Program %>% pivot_wider(...) or spread(...)
 #dim(wideDF)
@@ -462,61 +433,13 @@ tidyNjoin <- function(datList, filterList, hospitalInfo) {
 Okay, take a stab at it!
 
 ```{r}
-# library(dplyr)
-library(tidyr)
-
-tidyNjoin <- function(datList, filterList,
-                      hospitalInfo,
-                      readmissionsClean){
-
-  cleanList <- lapply(seq_along(datList), function(i){
-
-    dat <- datList[[i]]
-    filt <- filterList[[i]]
-
-    dat %>%
-      select(
-        -any_of(c("MeasureId",
-                  "StartDate",
-                  "EndDate",
-                  "Footnote"))
-      ) %>%
-      filter(MeasureName %in% filt) %>%
-      distinct() %>%
-      pivot_wider(
-        names_from = MeasureName,
-        values_from = 3:ncol(.)
-      )
-
-  })
-
-  joinedDF <- Reduce(
-    function(x,y)
-      full_join(x,y, by = "FacilityId"),
-    cleanList)
-
-  joinedDF <- hospitalInfo %>%
-    distinct() %>%
-    full_join(joinedDF,
-              by = "FacilityId")
-
-  joinedDF <- full_join(
-    joinedDF,
-    readmissionsClean,
-    by = "FacilityId")
-
-  return(joinedDF)
-}
-
-mergedDF <- tidyNjoin(datList,filterList,hospitalInfo,readmissionsClean)
-
-dim(mergedDF)
+# Your function here.
 ```
 
 ##### **Question 13**: [1 point] 
 Why do you think I just made you work through this function? (**Hint**: What are you going to be asked to do in Project 1?)
 
-> This is a preview of what we will have to do in Project 1 as we will be asked to analyze some conditions and the relation to hospital readmissions.
+> Your answer here.
 
 ### The full, merged, tidied dataset for pneumonia. 
 
@@ -613,31 +536,16 @@ Although we ideally could just include these steps (and perhaps you did!) in our
 ##### **Question 14**: [1 point] 
 Looking through the feature names, you probably notice names like `LowerEstimate_Death rate for pneumonia patients`. We do not need the higher and lower estimates in this case; just the point estimates. Use the `contains()` function to **drop** any columns that contain `LowerEstimate` or `HigherEstimate`. Let's also go ahead and drop any columns containing `Denominator` and `HcahpsAnswerPercent` as well. How many features did you drop? 
 
-> I dropped 25 features
+> Your answer here.
 
 ```{r}
-# library(dplyr)
-cleanDF <- mergedDF %>%
-  select(
-    -contains("LowerEstimate"),
-    -contains("HigherEstimate"),
-    -contains("Denominator"),
-    -contains("HcahpsAnswerPercent")
-    )
-ncol(mergedDF) - ncol(cleanDF)
+# Your code here.
 ```
 
 **Note:** Please drop `FacilityName`, `TelephoneNumber`, `Address`, & `CityTown` at this stage as well, if they're still in your full dataset.
 
 ```{r}
-# library(dplyr)
-cleanDF <- mergedDF %>%
-  select(
-    -any_of(c("FacilityName",
-              "TelephoneNumber",
-              "Address",
-              "CityTown"))
-  )
+# Your code here.
 ```
 
 ## Encoding
@@ -647,13 +555,13 @@ cleanDF <- mergedDF %>%
 ##### **Question 15**: [1 point] 
 We need to perform encoding on all of the categorical columns, ultimately. However, we will focus first on the columns that begin with ``ComparedToNational_`, e.g., `ComparedToNational_Death rate for pneumonia patients`. What kind of encoding should we perform on these columns? Why? 
 
-> We need to perform ordinal encoding because these columns are categorical and have a natural ranking. 
+> Your answer here.
 
 
 ##### **Question 16**: [1 point] 
 What other column do we also need to perform this kind of encoding on?
 
-> I'm not entirely sure.
+> Your answer here.
 
 ##### **Question 17**: [3 points] 
 You probably expected this - attempt to encode those columns the method you selected. It's okay if you can only think of a way to brute-force this for now; I will show you code to help you do it faster after the assignment. :)
@@ -665,28 +573,9 @@ You probably expected this - attempt to encode those columns the method you sele
 * **Hint 3: **You may want to create a temporary dataframe that you execute the changes on and then replace the original columns from there. That way, you don't have to keep reloading the original data if you make mistakes!
 
 * **Hint 3: **For full credit, don't forget to double check that you managed to preserve all the data! The `table()` function is sufficient here.
-```{r}
-tempDF <- cleanDF
-```
 
 ```{r}
-# library(dplyr)
-
-tempDF <- tempDF %>%
-  mutate(across(
-    contains("ComparedToNational"),
-    ~ case_when(
-      . == "Below the national average" ~ -1,
-      . == "Same as the national average" ~ 0,
-      . == "Above the national average" ~ 1,
-      TRUE ~ NA_real_
-    )
-  ))
-
-table(
-  tempDF$`ComparedToNational_Death rate for pneumonia patients`,
-  useNA = "ifany"
-)
+# Your code here.
 ```
 
 
@@ -710,23 +599,20 @@ Go through the **frequency encoding** code chunk below and comment each line. Wh
 ```{r}
 cols2encode <- c("State", 
                "CountyParish")
-# Create a temporary data frame including the columns tro encode.
+
 temp <- pneumoniaFullEncoded[, names(pneumoniaFullEncoded) %in% cols2encode]
 
-# Define a reusable function that frequency encodes one column and create a frequency table counting how often each category appears. 
 add_freq <- function(data, column_name) {
   frequency_map <- table(data[[column_name]], useNA = "always")
-# Replace each category with its frequency count
   data[[column_name]] <- frequency_map[match(data[[column_name]],
                                              names(frequency_map))]
-# Return the modified data frame  
   return(data)
 }
-# Apply the frequency encoding function to each selected column.
+
 for (col in names(temp)) {
   temp <- add_freq(temp, col)
 }
-# Copy the encoded columns back into the original dataframe. 
+
 for (c in 1:length(cols2encode)) {
   pneumoniaFullEncoded[, cols2encode[c]] <- temp[, cols2encode[c]]
 }
@@ -744,13 +630,10 @@ Use your finally & freshly encoded version of `pneumoniaFullEncoded` to answer t
 **Hint 3: **If you decide it is ill-advised for either or both columns, make sure to remove those features from the dataset!
 
 ```{r}
-# 
-table(table(pneumoniaFullEncoded$State))
-
-table(table(pneumoniaFullEncoded$CountyParish))
+# Your code here.
 ```
 
-> From my tables it is clear that each encoded value only occurs once and therefore there is little to no duplication of encoded frequencies. 
+> Your answer here.
 
 
 ### Finishing touches
@@ -791,26 +674,14 @@ __Our very, very last steps!__ Your task is to identify the appropriate target v
 Use `pneumoniaAnalyze` to calculate an  `observed_readmission_rate` as the number of readmissions divided by the number of discharges, multiplied by 100, then drop the two columns used to make this new one. Now, using the data and the data dictionary, try to understand the relationship between `observed_readmission_rate` that we just created, the `PredictedReadmissionRate`, `ExpectedReadmissionRate`, and the `ExcessReadmissionRatio`. What is the relationship? What is the appropriate target to choose and why? 
 
 **Hint: **Think about (or perhaps try to investigate) why the **predicted** rate exists. What would be the (dis)advantage to using the predicted vs. the newly created `observed_readmission_rate`? 
-```{r}
-pneumoniaAnalyze <- pneumoniaAnalyze %>%
-  mutate(
-    observed_readmission_rate =
-      (NumberOfReadmissions / NumberOfDischarges) * 100
-  ) %>%
-  select(
-    -NumberOfReadmissions,
-    -NumberOfDischarges
-  )
-```
 
-> Observed readmission rate is the directly observed outcome whereas the predicted rate exists based on an adjusted estimate. 
-
+> Your answer here.
 
 ##### **Question 21**: [1 points] 
 
 Why did I have you drop the two columns used to make `observed_readmission_rate`?
 
-> Dropping those two columns prevents data leakage and leaving them in the dataset could potentially inflate model performance.
+> Your answer here.
 
 
 # Exploratory Data Analysis
@@ -826,37 +697,12 @@ Full points are awarded for professional plots with axis labels, labeled legends
 Need inspiration that comes with code?!? Check out the [R Graph Gallery](https://r-graph-gallery.com)!
 
 ```{r}
-library(ggplot2)
-library(dplyr)
-
-plotDF <- pneumoniaAnalyze %>%
-  mutate(
-    DeathRateCategory = factor(
-      `ComparedToNational_Death rate for pneumonia patients`,
-      levels = c(-1,0,1),
-      labels = c("Below National Avg",
-                 "Same as National Avg",
-                 "Above National Avg")
-    )
-  )
-
-ggplot(plotDF,
-       aes(x = observed_readmission_rate,
-           fill = DeathRateCategory)) +
-
-  geom_density(alpha = .5) +
-
-  labs(
-    title = "Distribution of Observed Readmission Rates",
-    x = "Observed Readmission Rate (%)",
-    y = "Density",
-    fill = "Death Rate Category"
-  )
+# Your code here.
 ```
 
 Lastly, make sure to **interpret** your graphic.
 
-> The density plot demonstrates the distribution of observed pneumonia rates as a percentage, across the categories of national death rates. The graphic allows comparison of the center, spread and overlap of readmission rates among different hospitals. The degree of overlap suggests that other hospital factors likely contribute to readmission performance as well. 
+> Your answer here.
 
 
 # References
